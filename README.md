@@ -1,36 +1,133 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎬 Sistema de Gestión de Turnos - PHP
 
-## Getting Started
+Sistema web completo para la gestión de turnos de producción audiovisual, desarrollado con PHP y PostgreSQL.
 
-First, run the development server:
+## ✨ Características
 
+- **Autenticación segura** con hash de contraseñas
+- **Dashboard intuitivo** con métricas en tiempo real
+- **Gestión de turnos** completa
+- **Sistema de trabajadores** con capacitación
+- **Asignación de cámaras** (5, 6, 7, 8) y switch
+- **Disponibilidad personal** configurable
+- **Responsive design** con Tailwind CSS
+
+## 🚀 Instalación
+
+### Prerrequisitos
+- PHP 8.1+
+- PostgreSQL 13+
+- Composer
+
+### 1. Clonar e instalar dependencias
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <tu-repo>
+cd turnos
+composer install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Configurar base de datos
+```bash
+# Crear base de datos PostgreSQL
+createdb turnos_db
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Crear usuario
+psql -c "CREATE USER turnos_user WITH PASSWORD 'turnos_password';"
+psql -c "GRANT ALL PRIVILEGES ON DATABASE turnos_db TO turnos_user;"
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Ejecutar esquema
+psql -d turnos_db -f database/schema.sql
 
-## Learn More
+# Insertar datos iniciales
+psql -d turnos_db -f database/seed.sql
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Configurar entorno
+```bash
+cp .env.example .env
+# Editar .env con tus configuraciones
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Ejecutar servidor
+```bash
+composer serve
+# O manualmente: php -S localhost:8000 -t public
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 👥 Usuarios de Prueba
 
-## Deploy on Vercel
+- **Admin:** admin@turnos.com / admin123
+- **Usuario:** juan@turnos.com / user123
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📁 Estructura
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+turnos/
+├── src/
+│   ├── Controllers/     # Controladores
+│   ├── Models/         # Modelos de datos
+│   ├── Views/          # Vistas HTML
+│   └── Database.php    # Conexión DB
+├── database/
+│   ├── schema.sql      # Esquema de BD
+│   └── seed.sql        # Datos iniciales
+├── public/
+│   └── index.php       # Punto de entrada
+└── composer.json       # Dependencias
+```
+
+## 🔧 Configuración
+
+### Variables de Entorno (.env)
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=turnos_db
+DB_USER=turnos_user
+DB_PASS=turnos_password
+
+APP_ENV=development
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+```
+
+## 🌐 Deployment
+
+### Con Docker
+```bash
+# Crear Dockerfile y docker-compose.yml según necesidades
+docker-compose up -d
+```
+
+### En servidor tradicional
+1. Subir archivos al servidor
+2. Configurar base de datos PostgreSQL
+3. Configurar variables de entorno
+4. Apuntar dominio a `/public`
+
+## 🛠️ Desarrollo
+
+### Agregar nuevas rutas
+Editar `public/index.php` y agregar casos al switch.
+
+### Crear nuevos modelos
+Extender la clase base en `src/Models/`.
+
+### Agregar vistas
+Crear archivos PHP en `src/Views/`.
+
+## 🔒 Seguridad
+
+- Contraseñas hasheadas con `password_hash()`
+- Consultas preparadas (PDO)
+- Sanitización de entrada con `htmlspecialchars()`
+- Validación de sesiones
+- Filtros de entrada con `filter_input()`
+
+## 📄 Licencia
+
+Uso personal. Todos los derechos reservados.
+
+---
+
+**¡Sistema listo para gestionar turnos de producción audiovisual! 🎬✨**

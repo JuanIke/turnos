@@ -1,0 +1,19 @@
+{
+    "name": "turnos/sistema-turnos",
+    "description": "Sistema de Gestión de Turnos para Producción Audiovisual",
+    "type": "project",
+    "require": {
+        "php": "^8.1",
+        "vlucas/phpdotenv": "^5.5",
+        "twig/twig": "^3.7",
+        "symfony/http-foundation": "^6.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "scripts": {
+        "serve": "php -S localhost:8000 -t public"
+    }
+}

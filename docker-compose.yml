@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:80"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: turnos_db
+      DB_USER: turnos_user
+      DB_PASS: turnos_password
+      APP_ENV: production
+      APP_DEBUG: false
+    depends_on:
+      - postgres
+    volumes:
+      - .:/var/www/html
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: turnos_db
+      POSTGRES_USER: turnos_user
+      POSTGRES_PASSWORD: turnos_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+
+volumes:
+  postgres_data:
