@@ -20,7 +20,7 @@
     <header class="glass-card shadow-lg border-b border-white/20 mb-8 sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-6">
-                <a href="/shifts" class="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-200">
+                <a href="<?= $_SESSION['user_role'] === 'superadmin' ? '/dashboard' : '/shifts' ?>" class="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-200">
                     <div class="w-10 h-10 bg-gradient-to-r from-cyan-400 to-blue-600 rounded-full flex items-center justify-center">
                         <span class="text-lg">⛪</span>
                     </div>
