@@ -39,6 +39,51 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Roles del Ministerio -->
+            <div class="glass-card rounded-2xl shadow-xl border border-white/20">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">Roles del Ministerio</h2>
+                            <p class="text-gray-600 mt-1"><?= count($groupRoles) ?> rol<?= count($groupRoles) !== 1 ? 'es' : '' ?> disponible<?= count($groupRoles) !== 1 ? 's' : '' ?></p>
+                        </div>
+                        <button onclick="openCreateRoleModal()" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-2 rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 text-sm font-medium">
+                            + Agregar Rol
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <?php if (empty($groupRoles)): ?>
+                        <div class="text-center py-8">
+                            <p class="text-gray-500">No hay roles definidos</p>
+                        </div>
+                    <?php else: ?>
+                        <div class="space-y-3">
+                            <?php foreach ($groupRoles as $role): ?>
+                                <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3 border border-blue-200 hover:shadow-lg transition-all duration-300 cursor-pointer flex justify-between items-center">
+                                    <h4 class="font-semibold text-gray-900"><?= htmlspecialchars($role['name']) ?></h4>
+                                    <div class="relative">
+                                        <button onclick="toggleRoleMenu(<?= $role['id'] ?>)" class="text-gray-400 hover:text-gray-600 p-1">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                                            </svg>
+                                        </button>
+                                        <div id="roleMenu-<?= $role['id'] ?>" class="hidden absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                                            <button onclick="editRole(<?= $role['id'] ?>, '<?= htmlspecialchars($role['name']) ?>')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                Editar
+                                            </button>
+                                            <button onclick="deleteRole(<?= $role['id'] ?>, '<?= htmlspecialchars($role['name']) ?>')" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                                Eliminar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
             <!-- Usuarios del Grupo -->
             <div class="glass-card rounded-2xl shadow-xl border border-white/20">
                 <div class="p-6 border-b border-gray-200">
@@ -73,51 +118,6 @@
                                             <?php else: ?>
                                                 <span class="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 text-xs px-2 py-1 rounded-full font-medium">Usuario</span>
                                             <?php endif; ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <!-- Roles del Ministerio -->
-            <div class="glass-card rounded-2xl shadow-xl border border-white/20">
-                <div class="p-6 border-b border-gray-200">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h2 class="text-xl font-bold text-gray-900">Roles del Ministerio</h2>
-                            <p class="text-gray-600 mt-1"><?= count($groupRoles) ?> rol<?= count($groupRoles) !== 1 ? 'es' : '' ?> disponible<?= count($groupRoles) !== 1 ? 's' : '' ?></p>
-                        </div>
-                        <button onclick="openCreateRoleModal()" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-2 rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 text-sm font-medium">
-                            + Agregar Rol
-                        </button>
-                    </div>
-                </div>
-                <div class="p-6">
-                    <?php if (empty($groupRoles)): ?>
-                        <div class="text-center py-8">
-                            <p class="text-gray-500">No hay roles definidos</p>
-                        </div>
-                    <?php else: ?>
-                        <div class="space-y-3">
-                            <?php foreach ($groupRoles as $role): ?>
-                                <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3 border border-blue-200 flex justify-between items-center">
-                                    <h4 class="font-semibold text-gray-900"><?= htmlspecialchars($role['name']) ?></h4>
-                                    <div class="relative">
-                                        <button onclick="toggleRoleMenu(<?= $role['id'] ?>)" class="text-gray-400 hover:text-gray-600 p-1">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
-                                            </svg>
-                                        </button>
-                                        <div id="roleMenu-<?= $role['id'] ?>" class="hidden absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                                            <button onclick="editRole(<?= $role['id'] ?>, '<?= htmlspecialchars($role['name']) ?>')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                Editar
-                                            </button>
-                                            <button onclick="deleteRole(<?= $role['id'] ?>, '<?= htmlspecialchars($role['name']) ?>')" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                                                Eliminar
-                                            </button>
                                         </div>
                                     </div>
                                 </div>
