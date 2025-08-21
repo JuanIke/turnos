@@ -18,18 +18,20 @@ class DashboardController
 
     public function index()
     {
-        $currentMonth = date('n');
-        $currentYear = date('Y');
+        // Obtener conteos dinámicos
+        $db = \App\Database::getInstance()->getConnection();
         
-        $shifts = $this->shiftModel->getByMonth($currentYear, $currentMonth);
-        $workers = $this->workerModel->getAll();
+        // Contar turnos
+        $stmt = $db->query("SELECT COUNT(*) as total FROM shifts");
+        $totalShifts = $stmt->fetch()['total'];
         
-        $stats = [
-            'total_shifts' => count($shifts),
-            'total_workers' => count($workers),
-            'pending_shifts' => count(array_filter($shifts, fn($s) => $s['status'] === 'pending')),
-            'training_workers' => count(array_filter($workers, fn($w) => $w['training_stage'] !== 'COMPLETED'))
-        ];
+        // Contar servidores (usuarios que no son superadmin)
+        $stmt = $db->query("SELECT COUNT(*) as total FROM users WHERE role != 'superadmin' AND is_active = true");
+        $totalServers = $stmt->fetch()['total'];
+        
+        // Contar grupos
+        $stmt = $db->query("SELECT COUNT(*) as total FROM work_groups");
+        $totalGroups = $stmt->fetch()['total'];
 
         include __DIR__ . '/../Views/dashboard/index.php';
     }

@@ -52,4 +52,27 @@ class ShiftController
         header('Location: /shifts');
         exit;
     }
+
+    public function edit($id)
+    {
+        $name = htmlspecialchars($_POST['name'] ?? '', ENT_QUOTES, 'UTF-8');
+        $date = htmlspecialchars($_POST['date'] ?? '', ENT_QUOTES, 'UTF-8');
+        $start_time = htmlspecialchars($_POST['start_time'] ?? '', ENT_QUOTES, 'UTF-8');
+        $end_time = htmlspecialchars($_POST['end_time'] ?? '', ENT_QUOTES, 'UTF-8');
+
+        if (!$name || !$date || !$start_time || !$end_time) {
+            header('Location: /shifts');
+            exit;
+        }
+
+        $this->shiftModel->update($id, [
+            'name' => $name,
+            'date' => $date,
+            'start_time' => $start_time,
+            'end_time' => $end_time
+        ]);
+
+        header('Location: /shifts');
+        exit;
+    }
 }

@@ -77,7 +77,14 @@
         <!-- Lista de Turnos -->
         <div class="glass-card rounded-2xl shadow-xl border border-white/20">
             <div class="p-6 border-b border-gray-200">
-                <h2 class="text-xl font-bold text-gray-900">Turnos Programados</h2>
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-900">Turnos Programados</h2>
+                    <?php if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'superadmin'): ?>
+                        <a href="/shifts/auto-assign" class="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 py-2 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 text-sm font-medium">
+                            Asignación Automática
+                        </a>
+                    <?php endif; ?>
+                </div>
             </div>
             <div class="p-6">
                 <?php if (empty($shifts)): ?>
@@ -87,7 +94,7 @@
                 <?php else: ?>
                     <div class="grid gap-4">
                         <?php foreach ($shifts as $shift): ?>
-                            <div class="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-100">
+                            <div class="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-100 hover:shadow-lg transition-all duration-300 cursor-pointer">
                                 <div class="grid grid-cols-3 items-center gap-4">
                                     <!-- Columna Izquierda: Nombre y Horario -->
                                     <div>
@@ -104,12 +111,10 @@
                                     
                                     <!-- Columna Derecha: Botones -->
                                     <div class="flex justify-end items-center space-x-2">
-                                        <?php if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'superadmin'): ?>
-                                            <a href="/shifts/<?= $shift['id'] ?>/assignments" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1 rounded-lg text-xs hover:from-blue-600 hover:to-blue-700 transition-all duration-200">
-                                                Asignar
-                                            </a>
-                                        <?php endif; ?>
                                         <?php if ($_SESSION['user_role'] === 'superadmin'): ?>
+                                            <button onclick="openEditModal(<?= $shift['id'] ?>, '<?= htmlspecialchars($shift['name']) ?>', '<?= $shift['date'] ?>', '<?= substr($shift['start_time'], 0, 5) ?>', '<?= substr($shift['end_time'], 0, 5) ?>')" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-lg text-xs hover:from-green-600 hover:to-green-700 transition-all duration-200">
+                                                Editar
+                                            </button>
                                             <a href="/shifts/<?= $shift['id'] ?>/delete" onclick="return confirm('¿Estás seguro de eliminar este turno?')" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-lg text-xs hover:from-red-600 hover:to-red-700 transition-all duration-200">
                                                 Eliminar
                                             </a>
@@ -121,6 +126,42 @@
                     </div>
                 <?php endif; ?>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edición -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="glass-card rounded-2xl shadow-2xl p-6 border border-white/20 w-full max-w-md mx-4">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Editar Turno</h3>
+            <form id="editForm" method="POST">
+                <input type="hidden" id="editId" name="id">
+                <div class="space-y-4">
+                    <div>
+                        <label for="editName" class="block text-sm font-medium text-gray-700 mb-2">Nombre del Turno</label>
+                        <input type="text" id="editName" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="editDate" class="block text-sm font-medium text-gray-700 mb-2">Fecha</label>
+                        <input type="date" id="editDate" name="date" required class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="editStartTime" class="block text-sm font-medium text-gray-700 mb-2">Hora Inicio</label>
+                        <input type="time" id="editStartTime" name="start_time" required class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" step="60">
+                    </div>
+                    <div>
+                        <label for="editEndTime" class="block text-sm font-medium text-gray-700 mb-2">Hora Fin</label>
+                        <input type="time" id="editEndTime" name="end_time" required class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" step="60">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="closeEditModal()" class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-4 py-2 rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all duration-200">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-2 rounded-xl hover:from-cyan-600 hover:to-blue-700 transition-all duration-200">
+                        Guardar
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -137,6 +178,27 @@
                     card.style.transform = 'translateY(0)';
                 }, index * 100);
             });
+        });
+
+        function openEditModal(id, name, date, startTime, endTime) {
+            document.getElementById('editId').value = id;
+            document.getElementById('editName').value = name;
+            document.getElementById('editDate').value = date;
+            document.getElementById('editStartTime').value = startTime;
+            document.getElementById('editEndTime').value = endTime;
+            document.getElementById('editForm').action = '/shifts/' + id + '/edit';
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditModal();
+            }
         });
     </script>
 </body>

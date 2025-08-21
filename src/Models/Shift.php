@@ -34,7 +34,7 @@ class Shift
             SELECT s.*, st.name as shift_type_name, st.color as shift_type_color
             FROM shifts s
             LEFT JOIN shift_types st ON s.shift_type_id = st.id
-            ORDER BY s.date DESC, s.start_time
+            ORDER BY s.date ASC, s.start_time
         ";
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();
@@ -93,5 +93,18 @@ class Shift
         $sql = "DELETE FROM shifts WHERE id = ?";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([$id]);
+    }
+
+    public function update(int $id, array $data): bool
+    {
+        $sql = "UPDATE shifts SET name = ?, date = ?, start_time = ?, end_time = ? WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            $data['name'],
+            $data['date'],
+            $data['start_time'],
+            $data['end_time'],
+            $id
+        ]);
     }
 }

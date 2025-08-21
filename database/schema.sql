@@ -69,6 +69,24 @@ CREATE TABLE availability (
     UNIQUE(worker_id, date)
 );
 
+-- Tabla de grupos de trabajo
+CREATE TABLE work_groups (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT,
+    color VARCHAR(7) DEFAULT '#3B82F6',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabla de asignación de usuarios a grupos
+CREATE TABLE user_work_groups (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    work_group_id INTEGER REFERENCES work_groups(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, work_group_id)
+);
+
 -- Índices para optimización
 CREATE INDEX idx_shifts_date ON shifts(date);
 CREATE INDEX idx_assignments_shift_worker ON assignments(shift_id, worker_id);

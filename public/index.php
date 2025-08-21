@@ -75,6 +75,123 @@ switch ($path) {
         $controller->delete($matches[1]);
         break;
         
+    case (preg_match('/^\/shifts\/([0-9]+)\/edit$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] !== 'admin' && $_SESSION['user_role'] !== 'superadmin')) {
+            header('Location: /dashboard');
+            exit;
+        }
+        $controller = new ShiftController();
+        $controller->edit($matches[1]);
+        break;
+        
+    case '/shifts/auto-assign':
+        if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] !== 'admin' && $_SESSION['user_role'] !== 'superadmin')) {
+            header('Location: /dashboard');
+            exit;
+        }
+        $controller = new \App\Controllers\AutoAssignController();
+        $controller->index();
+        break;
+        
+    case (preg_match('/^\/shifts\/auto-assign\/([0-9]+)$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] !== 'admin' && $_SESSION['user_role'] !== 'superadmin')) {
+            header('Location: /dashboard');
+            exit;
+        }
+        $controller = new \App\Controllers\AutoAssignController();
+        $controller->showGroup($matches[1]);
+        break;
+        
+    case '/shifts/ai-assign':
+        if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] !== 'admin' && $_SESSION['user_role'] !== 'superadmin')) {
+            header('Location: /dashboard');
+            exit;
+        }
+        $controller = new \App\Controllers\AIAssignController();
+        $controller->processAssignment();
+        break;
+        
+    case '/work-groups':
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('Location: /dashboard');
+            exit;
+        }
+        $controller = new \App\Controllers\WorkGroupController();
+        $controller->index();
+        break;
+        
+    case '/work-groups/assign':
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('Location: /dashboard');
+            exit;
+        }
+        $controller = new \App\Controllers\WorkGroupController();
+        $controller->assignUser();
+        break;
+        
+    case '/work-groups/remove':
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('Location: /dashboard');
+            exit;
+        }
+        $controller = new \App\Controllers\WorkGroupController();
+        $controller->removeUser();
+        break;
+        
+    case (preg_match('/^\/work-groups\/([0-9]+)\/edit$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('Location: /dashboard');
+            exit;
+        }
+        $controller = new \App\Controllers\WorkGroupController();
+        $controller->edit($matches[1]);
+        break;
+        
+    case '/work-groups/create':
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('Location: /dashboard');
+            exit;
+        }
+        $controller = new \App\Controllers\WorkGroupController();
+        $controller->createGroup();
+        break;
+        
+    case (preg_match('/^\/work-groups\/([0-9]+)\/delete$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('Location: /dashboard');
+            exit;
+        }
+        $controller = new \App\Controllers\WorkGroupController();
+        $controller->delete($matches[1]);
+        break;
+        
+    case (preg_match('/^\/work-groups\/([0-9]+)\/users$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('Location: /dashboard');
+            exit;
+        }
+        $controller = new \App\Controllers\WorkGroupController();
+        $controller->showUsers($matches[1]);
+        break;
+        
+    case (preg_match('/^\/work-groups\/([0-9]+)\/add-user$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('Location: /dashboard');
+            exit;
+        }
+        $controller = new \App\Controllers\WorkGroupController();
+        $controller->addUserToGroup($matches[1]);
+        break;
+        
+    case (preg_match('/^\/work-groups\/([0-9]+)\/remove-user\/([0-9]+)$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('Location: /dashboard');
+            exit;
+        }
+        $controller = new \App\Controllers\WorkGroupController();
+        $controller->removeUserFromGroup($matches[1], $matches[2]);
+        break;
+        
     default:
         http_response_code(404);
         echo "Página no encontrada";
