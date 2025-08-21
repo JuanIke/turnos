@@ -3,21 +3,21 @@
 namespace App\Controllers;
 
 use App\Models\WorkGroup;
+use App\Models\User;
 use App\Models\Shift;
 
-class AutoAssignController
-{
+class AutoAssignController {
     private $workGroupModel;
+    private $userModel;
     private $shiftModel;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->workGroupModel = new WorkGroup();
+        $this->userModel = new User();
         $this->shiftModel = new Shift();
     }
 
-    public function index()
-    {
+    public function index() {
         // SuperAdmin ve todos los grupos, Admin solo los suyos
         if ($_SESSION['user_role'] === 'superadmin') {
             $userGroups = $this->workGroupModel->getAll();
@@ -27,8 +27,7 @@ class AutoAssignController
         include __DIR__ . '/../Views/auto-assign/index.php';
     }
 
-    public function showGroup($groupId)
-    {
+    public function showGroup($groupId) {
         // SuperAdmin tiene acceso a todos los grupos
         if ($_SESSION['user_role'] !== 'superadmin') {
             // Verificar que el admin pertenece a este grupo

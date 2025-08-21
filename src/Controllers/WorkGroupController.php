@@ -4,16 +4,19 @@ namespace App\Controllers;
 
 use App\Models\WorkGroup;
 use App\Models\User;
+use App\Models\MinistryRole;
 
 class WorkGroupController
 {
     private $workGroupModel;
     private $userModel;
+    private $ministryRoleModel;
 
     public function __construct()
     {
         $this->workGroupModel = new WorkGroup();
         $this->userModel = new User();
+        $this->ministryRoleModel = new MinistryRole();
     }
 
     public function index()
@@ -99,6 +102,13 @@ class WorkGroupController
         
         $users = $this->workGroupModel->getUsersByGroup($groupId);
         $availableUsers = $this->workGroupModel->getAvailableUsers($groupId);
+        $groupRoles = $this->ministryRoleModel->getRolesByGroup($groupId);
+        
+        // Agregar roles de ministerio a cada usuario
+        foreach ($users as &$user) {
+            $user['ministry_roles'] = $this->ministryRoleModel->getUserRoles($user['id'], $groupId);
+        }
+        
         include __DIR__ . '/../Views/work-groups/users.php';
     }
 
@@ -118,6 +128,31 @@ class WorkGroupController
     {
         $this->workGroupModel->removeUserFromGroup($userId, $groupId);
         header('Location: /work-groups/' . $groupId . '/users');
+        exit;
+    }
+
+    public function getUserRoles($groupId, $userId)
+    {
+        header('Content-Type: application/json');
+        $roles = $this->ministryRoleModel->getUserRoles($userId, $groupId);
+        $roleIds = array_column($roles, 'id');
+        echo json_encode(['roles' => $roleIds]);
+        exit;
+    }
+
+    public function assignRoles($groupId)
+    {
+        header('Content-Type: application/json');
+        $input = json_decode(file_get_contents('php://input'), true);
+        $userId = $input['user_id'];
+        $roleIds = $input['role_ids'];
+        
+        try {
+            $this->ministryRoleModel->assignUserRoles($userId, $groupId, $roleIds);
+            echo json_encode(['success' => true]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
         exit;
     }
 }

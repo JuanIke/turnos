@@ -192,6 +192,24 @@ switch ($path) {
         $controller->removeUserFromGroup($matches[1], $matches[2]);
         break;
         
+    case (preg_match('/^\/work-groups\/([0-9]+)\/user-roles\/([0-9]+)$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('HTTP/1.1 403 Forbidden');
+            exit;
+        }
+        $controller = new \App\Controllers\WorkGroupController();
+        $controller->getUserRoles($matches[1], $matches[2]);
+        break;
+        
+    case (preg_match('/^\/work-groups\/([0-9]+)\/assign-roles$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('HTTP/1.1 403 Forbidden');
+            exit;
+        }
+        $controller = new \App\Controllers\WorkGroupController();
+        $controller->assignRoles($matches[1]);
+        break;
+        
     default:
         http_response_code(404);
         echo "Página no encontrada";
