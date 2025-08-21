@@ -237,6 +237,117 @@ switch ($path) {
         $controller->deleteRole($matches[1], $matches[2]);
         break;
         
+    case '/users':
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('Location: /dashboard');
+            exit;
+        }
+        $controller = new \App\Controllers\UserController();
+        $controller->index();
+        break;
+        
+    case (preg_match('/^\/users\/([0-9]+)$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('Location: /dashboard');
+            exit;
+        }
+        $controller = new \App\Controllers\UserController();
+        $controller->show($matches[1]);
+        break;
+        
+    case (preg_match('/^\/users\/([0-9]+)\/update-name$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('HTTP/1.1 403 Forbidden');
+            exit;
+        }
+        $controller = new \App\Controllers\UserController();
+        $controller->updateName($matches[1]);
+        break;
+        
+    case (preg_match('/^\/users\/([0-9]+)\/groups$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('HTTP/1.1 403 Forbidden');
+            exit;
+        }
+        $controller = new \App\Controllers\UserController();
+        $controller->showGroups($matches[1]);
+        break;
+        
+    case (preg_match('/^\/users\/([0-9]+)\/update-groups$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('HTTP/1.1 403 Forbidden');
+            exit;
+        }
+        $controller = new \App\Controllers\UserController();
+        $controller->updateGroups($matches[1]);
+        break;
+        
+
+        
+    case (preg_match('/^\/users\/([0-9]+)\/update-roles\/([0-9]+)$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('HTTP/1.1 403 Forbidden');
+            exit;
+        }
+        $controller = new \App\Controllers\UserController();
+        $controller->updateRoles($matches[1], $matches[2]);
+        break;
+        
+    case (preg_match('/^\/users\/([0-9]+)\/available-groups$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('HTTP/1.1 403 Forbidden');
+            exit;
+        }
+        $controller = new \App\Controllers\UserController();
+        $controller->showAvailableGroups($matches[1]);
+        break;
+        
+    case (preg_match('/^\/users\/([0-9]+)\/groups\/([0-9]+)$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('HTTP/1.1 403 Forbidden');
+            exit;
+        }
+        $controller = new \App\Controllers\UserController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller->addUserToGroup($matches[1], $matches[2]);
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+            $controller->removeUserFromGroup($matches[1], $matches[2]);
+        }
+        break;
+        
+    case (preg_match('/^\/users\/([0-9]+)\/groups\/([0-9]+)\/available-roles$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('HTTP/1.1 403 Forbidden');
+            exit;
+        }
+        $controller = new \App\Controllers\UserController();
+        $controller->showAvailableRoles($matches[1], $matches[2]);
+        break;
+        
+    case (preg_match('/^\/users\/([0-9]+)\/roles\/([0-9]+)$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('HTTP/1.1 403 Forbidden');
+            exit;
+        }
+        $controller = new \App\Controllers\UserController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller->addRoleToUser($matches[1], $matches[2]);
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+            $controller->removeRoleFromUser($matches[1], $matches[2]);
+        } else {
+            $controller->showRoles($matches[1], $matches[2]);
+        }
+        break;
+        
+    case (preg_match('/^\/users\/([0-9]+)\/user-roles\/([0-9]+)$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('HTTP/1.1 403 Forbidden');
+            exit;
+        }
+        $controller = new \App\Controllers\UserController();
+        $controller->showRoles($matches[1], $matches[2]);
+        break;
+        
     default:
         http_response_code(404);
         echo "Página no encontrada";
