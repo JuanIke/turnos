@@ -155,4 +155,45 @@ class WorkGroupController
         }
         exit;
     }
+    
+    public function createRole($groupId)
+    {
+        $name = htmlspecialchars($_POST['name'] ?? '', ENT_QUOTES, 'UTF-8');
+        
+        if (!$name) {
+            header('Location: /work-groups/' . $groupId . '/users');
+            exit;
+        }
+        
+        $this->ministryRoleModel->create([
+            'name' => $name,
+            'work_group_id' => $groupId
+        ]);
+        
+        header('Location: /work-groups/' . $groupId . '/users');
+        exit;
+    }
+    
+    public function editRole($groupId)
+    {
+        $roleId = filter_input(INPUT_POST, 'role_id', FILTER_VALIDATE_INT);
+        $name = htmlspecialchars($_POST['name'] ?? '', ENT_QUOTES, 'UTF-8');
+        
+        if (!$roleId || !$name) {
+            header('Location: /work-groups/' . $groupId . '/users');
+            exit;
+        }
+        
+        $this->ministryRoleModel->update($roleId, ['name' => $name]);
+        
+        header('Location: /work-groups/' . $groupId . '/users');
+        exit;
+    }
+    
+    public function deleteRole($groupId, $roleId)
+    {
+        $this->ministryRoleModel->delete($roleId);
+        header('Location: /work-groups/' . $groupId . '/users');
+        exit;
+    }
 }

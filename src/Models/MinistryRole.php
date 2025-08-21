@@ -62,4 +62,45 @@ class MinistryRole
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([$userId, $roleId]);
     }
+    
+    public function assignUserRoles(int $userId, int $groupId, array $roleIds): bool
+    {
+        // Primero eliminar roles existentes del usuario en este grupo
+        $sql = "DELETE FROM user_ministry_roles WHERE user_id = ? AND ministry_role_id IN (SELECT id FROM ministry_roles WHERE work_group_id = ?)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$userId, $groupId]);
+        
+        // Luego insertar los nuevos roles
+        if (!empty($roleIds)) {
+            $sql = "INSERT INTO user_ministry_roles (user_id, ministry_role_id) VALUES (?, ?)";
+            $stmt = $this->db->prepare($sql);
+            foreach ($roleIds as $roleId) {
+                $stmt->execute([$userId, $roleId]);
+            }
+        }
+        
+        return true;
+    }
+    
+    public function create(array $data): int
+    {
+        $sql = "INSERT INTO ministry_roles (name, work_group_id) VALUES (?, ?)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$data['name'], $data['work_group_id']]);
+        return $this->db->lastInsertId();
+    }
+    
+    public function update(int $id, array $data): bool
+    {
+        $sql = "UPDATE ministry_roles SET name = ? WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$data['name'], $id]);
+    }
+    
+    public function delete(int $id): bool
+    {
+        $sql = "DELETE FROM ministry_roles WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$id]);
+    }
 }

@@ -120,8 +120,15 @@
             <!-- Roles del Ministerio -->
             <div class="glass-card rounded-2xl shadow-xl border border-white/20">
                 <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-xl font-bold text-gray-900">Roles del Ministerio</h2>
-                    <p class="text-gray-600 mt-1"><?= count($groupRoles) ?> rol<?= count($groupRoles) !== 1 ? 'es' : '' ?> disponible<?= count($groupRoles) !== 1 ? 's' : '' ?></p>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">Roles del Ministerio</h2>
+                            <p class="text-gray-600 mt-1"><?= count($groupRoles) ?> rol<?= count($groupRoles) !== 1 ? 'es' : '' ?> disponible<?= count($groupRoles) !== 1 ? 's' : '' ?></p>
+                        </div>
+                        <button onclick="openCreateRoleModal()" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-2 rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 text-sm font-medium">
+                            + Agregar Rol
+                        </button>
+                    </div>
                 </div>
                 <div class="p-6">
                     <?php if (empty($groupRoles)): ?>
@@ -131,11 +138,23 @@
                     <?php else: ?>
                         <div class="space-y-3">
                             <?php foreach ($groupRoles as $role): ?>
-                                <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3 border border-blue-200">
+                                <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3 border border-blue-200 flex justify-between items-center">
                                     <h4 class="font-semibold text-gray-900"><?= htmlspecialchars($role['name']) ?></h4>
-                                    <?php if ($role['description']): ?>
-                                        <p class="text-sm text-gray-600 mt-1"><?= htmlspecialchars($role['description']) ?></p>
-                                    <?php endif; ?>
+                                    <div class="relative">
+                                        <button onclick="toggleRoleMenu(<?= $role['id'] ?>)" class="text-gray-400 hover:text-gray-600 p-1">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                                            </svg>
+                                        </button>
+                                        <div id="roleMenu-<?= $role['id'] ?>" class="hidden absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                                            <button onclick="editRole(<?= $role['id'] ?>, '<?= htmlspecialchars($role['name']) ?>')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                Editar
+                                            </button>
+                                            <button onclick="deleteRole(<?= $role['id'] ?>, '<?= htmlspecialchars($role['name']) ?>')" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                                Eliminar
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
@@ -218,6 +237,57 @@
                 <button type="button" onclick="saveUserRoles()" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200">
                     Guardar
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Crear/Editar Rol -->
+    <div id="createRoleModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="glass-card rounded-2xl shadow-2xl p-6 border border-white/20 w-full max-w-md mx-4">
+            <h3 id="roleModalTitle" class="text-xl font-bold text-gray-900 mb-4">Crear Rol</h3>
+            <form id="roleForm" method="POST">
+                <input type="hidden" id="roleId" name="role_id">
+                <div class="space-y-4">
+                    <div>
+                        <label for="roleName" class="block text-sm font-medium text-gray-700 mb-2">Nombre del Rol</label>
+                        <input type="text" id="roleName" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="closeCreateRoleModal()" class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-4 py-2 rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all duration-200">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Confirmación Eliminar Rol -->
+    <div id="deleteRoleModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="glass-card rounded-2xl shadow-2xl p-6 border border-white/20 w-full max-w-md mx-4">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                    <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Eliminar Rol</h3>
+                <p class="text-sm text-gray-600 mb-6">
+                    ¿Estás seguro de eliminar el rol "<span id="deleteRoleName" class="font-medium"></span>"?
+                    <br><br>
+                    Esta acción no se puede deshacer.
+                </p>
+                <div class="flex justify-center space-x-3">
+                    <button type="button" onclick="closeDeleteRoleModal()" class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-4 py-2 rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all duration-200">
+                        Cancelar
+                    </button>
+                    <button type="button" id="confirmDeleteRoleBtn" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200">
+                        Eliminar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -401,6 +471,48 @@
                 }
             });
         }
+        
+        function toggleRoleMenu(roleId) {
+            const menu = document.getElementById('roleMenu-' + roleId);
+            document.querySelectorAll('[id^="roleMenu-"]').forEach(m => {
+                if (m.id !== 'roleMenu-' + roleId) m.classList.add('hidden');
+            });
+            menu.classList.toggle('hidden');
+        }
+        
+        function openCreateRoleModal() {
+            document.getElementById('roleModalTitle').textContent = 'Crear Rol';
+            document.getElementById('roleId').value = '';
+            document.getElementById('roleName').value = '';
+            document.getElementById('roleForm').action = '/work-groups/<?= $group['id'] ?>/create-role';
+            document.getElementById('createRoleModal').classList.remove('hidden');
+        }
+        
+        function editRole(id, name) {
+            document.getElementById('roleModalTitle').textContent = 'Editar Rol';
+            document.getElementById('roleId').value = id;
+            document.getElementById('roleName').value = name;
+            document.getElementById('roleForm').action = '/work-groups/<?= $group['id'] ?>/edit-role';
+            document.getElementById('createRoleModal').classList.remove('hidden');
+            document.querySelectorAll('[id^="roleMenu-"]').forEach(m => m.classList.add('hidden'));
+        }
+        
+        function deleteRole(id, name) {
+            document.getElementById('deleteRoleName').textContent = name;
+            document.getElementById('confirmDeleteRoleBtn').onclick = function() {
+                window.location.href = '/work-groups/<?= $group['id'] ?>/delete-role/' + id;
+            };
+            document.getElementById('deleteRoleModal').classList.remove('hidden');
+            document.querySelectorAll('[id^="roleMenu-"]').forEach(m => m.classList.add('hidden'));
+        }
+        
+        function closeCreateRoleModal() {
+            document.getElementById('createRoleModal').classList.add('hidden');
+        }
+        
+        function closeDeleteRoleModal() {
+            document.getElementById('deleteRoleModal').classList.add('hidden');
+        }
 
         // Cerrar modales y menús al hacer clic fuera
         document.addEventListener('click', function(e) {
@@ -424,6 +536,15 @@
             }
             if (e.target.id === 'roleModal') {
                 closeRoleModal();
+            }
+            if (e.target.id === 'createRoleModal') {
+                closeCreateRoleModal();
+            }
+            if (e.target.id === 'deleteRoleModal') {
+                closeDeleteRoleModal();
+            }
+            if (!e.target.closest('[id^="roleMenu-"]') && !e.target.closest('button')) {
+                document.querySelectorAll('[id^="roleMenu-"]').forEach(m => m.classList.add('hidden'));
             }
         });
     </script>

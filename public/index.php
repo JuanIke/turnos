@@ -210,6 +210,33 @@ switch ($path) {
         $controller->assignRoles($matches[1]);
         break;
         
+    case (preg_match('/^\/work-groups\/([0-9]+)\/create-role$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('HTTP/1.1 403 Forbidden');
+            exit;
+        }
+        $controller = new \App\Controllers\WorkGroupController();
+        $controller->createRole($matches[1]);
+        break;
+        
+    case (preg_match('/^\/work-groups\/([0-9]+)\/edit-role$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('HTTP/1.1 403 Forbidden');
+            exit;
+        }
+        $controller = new \App\Controllers\WorkGroupController();
+        $controller->editRole($matches[1]);
+        break;
+        
+    case (preg_match('/^\/work-groups\/([0-9]+)\/delete-role\/([0-9]+)$/', $path, $matches) ? true : false):
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
+            header('HTTP/1.1 403 Forbidden');
+            exit;
+        }
+        $controller = new \App\Controllers\WorkGroupController();
+        $controller->deleteRole($matches[1], $matches[2]);
+        break;
+        
     default:
         http_response_code(404);
         echo "Página no encontrada";
